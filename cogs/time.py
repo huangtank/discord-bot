@@ -65,7 +65,7 @@ class Countdown(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         await self.countdown_daily()
-        await update_countdown_daily()
+        self.update_countdown_daily.start()
         print('Countdown cog is ready')
 
 async def setup(bot):
