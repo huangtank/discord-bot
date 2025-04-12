@@ -12,7 +12,6 @@ class Countdown(commands.Cog):
         self.TIMEZONE = pytz.timezone('Asia/Shanghai')
         self.統測 = file["統測"]
         self.模考 = file["模考"]
-        self.update_countdown_daily.start()
 
     async def countdown_daily(self):
         current_date = datetime.datetime.now(self.TIMEZONE).date()
