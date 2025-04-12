@@ -1,5 +1,9 @@
 import discord
-from discord.ext import commands
+import datetime
+import pytz
+import json
+from discord.ext import commands, tasks
+import random
 
 trigger_responses = {
     "ewe": "ewe",
@@ -19,6 +23,14 @@ class Main(commands.Cog):
     async def 擲骰子(self, ctx: commands.Context):
         n = random.randint(0,1001)
         await ctx.send(n)
+
+    @commands.command()
+    async def 倒數(self, ctx: commands.Context):
+        TIMEZONE = pytz.timezone('Asia/Shanghai')
+        now = datetime.datetime.now(TIMEZONE).date()
+        統測 = datetime.date(2025,4,26)
+        await ctx.send(f"倒數{(統測-now).days}天")
+
     @commands.command()
     async def 指令是啥(self, ctx):
         embed = discord.Embed()

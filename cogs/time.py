@@ -4,7 +4,7 @@ import pytz
 import json
 from discord.ext import commands, tasks
 
-file = json.load(open(".\setting.json", "r", encoding="utf-8"))
+file = json.load(open("setting.json", "r", encoding="utf-8"))
 
 class Countdown(commands.Cog):
     def __init__(self, bot):
@@ -56,17 +56,16 @@ class Countdown(commands.Cog):
     async def before_update_countdown_daily(self):
         now = datetime.datetime.now(self.TIMEZONE)
         tomorrow = now + datetime.timedelta(days=1)
-        midnight = datetime.datetime.combine(tomorrow, datetime.time.min)
+        midnight = datetime.datetime.combine(tomorrow, datetime.time(0,1))
         print("現在", now)
         print("start")
-        print("明天", tomorrow)
         print("午夜", midnight)
         await discord.utils.sleep_until(midnight)
 
     @commands.Cog.listener()
     async def on_ready(self):
         await self.countdown_daily()
-        await update_countdown_daily.start()
+        await update_countdown_daily()
         print('Countdown cog is ready')
 
 async def setup(bot):
