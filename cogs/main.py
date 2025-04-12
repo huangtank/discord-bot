@@ -6,7 +6,6 @@ trigger_responses = {
     "不知道": "https://i.imgur.com/MfyFFux.jpg",
     "@1049693945145348116": "tag銃三小啦幹",
     "":"",
-    "":"",
 }
 class Main(commands.Cog):
     def __init__(self, bot: commands.Bot):
