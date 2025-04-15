@@ -1,10 +1,54 @@
+'''
+                               `-+syhddmmmddhyo+:`                              
+                            .+hmmdddddddddddddddmmds/`      ``...`              
+                         `/hmddddddddddddddddddddddddmy++osyhyyyhhs.            
+                       `ommddddddddddddddddddddddddddddmmdys+++syhhh:           
+           .`         /mmddddddddddddddddddddddddddddddddmmhyyyyyyyyh/          
+       `:sdNy`      .ymddddddddddddddddddddddddddddddddddddmdhhhyyyyyh-         
+   `.+hmmmddmo     -mmddddddddddddddddddddddddddddddddddddddmmhhhhhhhh+         
+  odmmdddddddms` `+mmddddddddddddddddddddddddddddddddddddddddmmddhhhhh+         
+  ymdmmmmmmmmdmmdmmdddddddddddddmmddddddddddddddddddddddddddddmd:ydhhd:         
+  :Nmmmmmmmmmmmmmmddy+::+ydddms/:::/+osydmdddddddddddddddddddddN-`:+o:          
+   ymmmmmmmmmmmmmmdo.`.``/hmm/+hdd/``````-+ydmdddddddddddddddddmy               
+   .mmmmmmmmmmmmmmh:`-o+`:hm/`-o:.```````os/./ymddddddddddddddddN`              
+    /Nmmmmmmmmmmmmh:..::-od/``dMs````````/hNm:`-ymddddddddddddddN-              
+     sNmmmmmmmmmmmd+-:/-.`..`.hh:`...``:hh..:```:NdmmmmmmmdmddddN/              
+  `::/dmmmmmmmmmmmmdo:```./d/````-..:`-mdd.````.dmdmmmmmmmmmmmdmmy              
+./::-..+dmmmmmmmmmmh/````-dNms-```..``.+/`````-dmds/:-:ohmmmmmmmmN.             
+-/.``--`/dmmmdysydmy.````omNd+.-::-...-:os:..`-hs-``.``./hmmmmmmmmd.       .os` 
+/:---.`.`-/sy:```omy-````hddo` `s.``/NNNNo...`````-+o/``/dmmmmmmmmmms:..:+ymmN: 
+:/.``.``````-``./dNh/````syyyhshd-``:mNmy.````````.```./hmmmmmmmmmmmmmmmmmmmmmd 
+ .::-```...````+dNNNs-```//::/+ooosyhdds.``````-----:+ydmmmmmmmmmmmmmmmmmmmmmmN:
+   `:/````..``-shhdmms-``./::/:::::::+/``````.+dmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmd
+     ./:-```.-oyyhyhhhy+.`.:/::::///:.````..:ymNNmmo:/ymmmmmmmmmmmmmmmmmmmmmmmmN
+       `:y:./yyyyyyyyhh///:..--:--.````..-/ymNNNNNy.``-hNNNNNmmmmmmmmmmmmmmNmh+-
+       `ymdyhyyyyyyhhy/---o+///:::::://oyhmNNNNNNNo```:osyho/---:ymmNNNNmho:`   
+       `+hhhhhyyyyhhs-----y--o/------:+hhhhhhhddds.````````..-..-+dNds+-`       
+         `.:+oossyyyy:---:ssoy:------+hyyyyhhyyys-``....```..--..//`            
+                    syysyysssho:-----ohyyyyhyhhyy/`````..``````-o.              
+                   `hssssssoyhhyo+++syyhhhhyyhyyh+:::-..-:::::::.               
+                   :hysssyo/yhhssyysssssyhyhhhyhdmmy....`                       
+                   shyyyyyyhhhhyyyyyyyyyyhh/-+syhdo`                            
+                  `hhhhhhhhhhhhhhhhhhhhhhhhy`                                   
+                   -:yhyyyysyhhyyyyyyyyyyyyh-                                   
+                     -hysssssyydsyyssssssssyh.                                  
+                      /hsysyyyyd-.+yyyssyyssyh-                                 
+          -/+oo++/-`   +hhyhhhso`  .ohyyyyyyhho:`   `-:/++++/:.                 
+       -+ooooooooooso+/ssss.yy:      `//+ds/oysss+ossoooooooo+os/.              
+    `:o+:/oooooooooooooooossyh:          oyyssooooooooooooooo+/:os+`            
+   -ssoooooooooooooooooosssssy+          .hyssssssooooooooooooooooss-           
+   /syysssssssssssssssyyyyyyyh-           shyyyysyyysssssssssssssssyy           
+     `-/+ossyyyysso+/:-./++//.             .---` `.-:/+oossssoo++/:-`           
+'''
+
 import discord
 import datetime
 import pytz
 import json
 from discord.ext import commands, tasks
+import os
 
-file = json.load(open("setting.json", "r", encoding="utf-8"))
+file = json.load(open(r"./setting.json", "r", encoding="utf-8"))
 
 class Countdown(commands.Cog):
     def __init__(self, bot):
@@ -24,8 +68,7 @@ class Countdown(commands.Cog):
         target_date_模考 = datetime.date(2025, 4, 8)
         days_模考 = (target_date_模考 - current_date).days
 
-        print('更改成功')
-        print(datetime.datetime.now(self.TIMEZONE))
+        print("⏰ 倒數任務執行時間：", datetime.datetime.now(self.TIMEZONE))
         print(f'統測剩餘{days_統測}天')
         print(f'五模剩餘{days_模考}天')
 
@@ -54,18 +97,26 @@ class Countdown(commands.Cog):
     @update_countdown_daily.before_loop
     async def before_update_countdown_daily(self):
         now = datetime.datetime.now(self.TIMEZONE)
+        
+        # 取得 Asia/Shanghai 的「明天 00:01」
         tomorrow = now + datetime.timedelta(days=1)
-        midnight = datetime.datetime.combine(tomorrow, datetime.time(0,1))
-        print("現在", now)
-        print("start")
-        print("午夜", midnight)
-        await discord.utils.sleep_until(midnight)
+        shanghai_midnight_001 = datetime.datetime.combine(tomorrow, datetime.time(0, 1))
+        shanghai_midnight_001 = self.TIMEZONE.localize(shanghai_midnight_001)
+
+        # 轉換成 UTC 給 sleep_until 用
+        utc_target = shanghai_midnight_001.astimezone(pytz.UTC)
+
+        print("現在時間：", now)
+        print("等待到（UTC）：", utc_target)
+
+        await discord.utils.sleep_until(utc_target)
 
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.countdown_daily()
-        self.update_countdown_daily.start()
-        print('Countdown cog is ready')
+        if not self.update_countdown_daily.is_running():
+            print("✅ Bot 已上線，準備啟動每日倒數更新任務")
+            await self.countdown_daily()
+            self.update_countdown_daily.start()
 
 async def setup(bot):
     await bot.add_cog(Countdown(bot))
